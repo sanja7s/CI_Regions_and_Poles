@@ -8,7 +8,7 @@ Created on Jun 19, 2014
 ### and sum the subprefs into regions OR development poles
 ########################################################
 from collections import defaultdict
-
+import numpy as np
 ########################################################
 # just save this output for development poles, separate Abidjan
 ########################################################
@@ -16,7 +16,7 @@ def save_dev_poles_user_stats():
     
     pole_stats = calculate_dev_pole_stat()
     
-    file_name = "/home/sscepano/Project7s/D4D/CI/user_stats/Poles/dev_pole_radius_gyration.tsv"
+    file_name = "/home/sscepano/Project7s/D4D/CI/user_stats/Poles_median/dev_pole_radius_gyration_median.tsv"
     f = open(file_name, "w")
     
     for pole in pole_stats.keys():
@@ -35,7 +35,9 @@ def calculate_dev_pole_stat():
     user_home = read_in_user_home()
     
     pole_stats = defaultdict(int)
-    pole_num = defaultdict(int)
+    
+    for pole in range(12):
+        pole_stats[pole] = []
     
     for user in user_stats.keys():
         subpref = user_home[user]
@@ -45,14 +47,16 @@ def calculate_dev_pole_stat():
             pole = region_pole[subpref_region[subpref]]
         else: 
             pole = 11
-            
-        pole_stats[pole] += user_stats[user]
-        pole_num[pole] += 1
+        if pole <> 0:    
+            pole_stats[pole].append(user_stats[user])
+        
+    pole_stats_fin = defaultdict(int)
         
     for pole in pole_stats.keys():
-        pole_stats[pole] /= float(pole_num[pole])
+        stats = np.array(pole_stats[pole])
+        pole_stats_fin[pole] = (np.median(stats))
         
-    return pole_stats
+    return pole_stats_fin
 
 
 def read_in_region_poles_mapping():

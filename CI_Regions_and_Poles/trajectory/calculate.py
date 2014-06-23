@@ -1,5 +1,5 @@
 '''
-Created on Jun 19, 2014
+Created on Jun 22, 2014
 
 @author: sscepano
 '''
@@ -17,11 +17,11 @@ def save_dev_poles_user_stats():
     
     pole_stats = calculate_dev_pole_stat()
     
-    file_name = "/home/sscepano/Project7s/D4D/CI/user_stats/Poles_median/dev_pole_fq_numDistSubpref_median.tsv"
+    file_name = "/home/sscepano/Project7s/D4D/CI/user_stats/Poles_median/dev_pole_total_traj_median.tsv"
     f = open(file_name, "w")
     
     for pole in pole_stats.keys():
-        f.write(str(pole) + '\t' + str(pole_stats[pole][0]) + '\t' + str(pole_stats[pole][1]) + '\n')
+        f.write(str(pole) + '\t' + str(pole_stats[pole]) + '\n')
         
  
 ########################################################
@@ -41,10 +41,9 @@ def calculate_dev_pole_stat():
     pole_stats = defaultdict(int)
     
     for pole in range(12):
-        pole_stats[pole] = defaultdict(int)
+        pole_stats[pole] = []
     
     for user in user_stats.keys():
-        print user
         subpref = user_home[user]
         if subpref == -1 or subpref == 0:
             continue
@@ -52,23 +51,14 @@ def calculate_dev_pole_stat():
             pole = region_pole[subpref_region[subpref]]
         else: 
             pole = 11
-## this one was testing and found problem due to -1 
-        if pole == 0:
-            print user, subpref, subpref_region[subpref], region_pole[subpref_region[subpref]]
-        else:
-            pole_stats[pole][0] = pole_stats[pole].get(0, [])
-            pole_stats[pole][1] = pole_stats[pole].get(1, [])
-            pole_stats[pole][0].append(user_stats[user][0])
-            pole_stats[pole][1].append(user_stats[user][1])
-    
+        if pole <> 0:    
+            pole_stats[pole].append(user_stats[user])
+        
     pole_stats_fin = defaultdict(int)
-    
-
         
     for pole in pole_stats.keys():
-        stats1 = np.array(pole_stats[pole][0])
-        stats2 = np.array(pole_stats[pole][1])
-        pole_stats_fin[pole] = (np.median(stats1), np.median(stats2))
+        stats = np.array(pole_stats[pole])
+        pole_stats_fin[pole] = (np.median(stats))
         
     return pole_stats_fin
 
@@ -117,18 +107,17 @@ def read_in_subpref_region():
 ########################################################
 def read_in_user_stats():
                   
-    file_name = "/home/sscepano/Project7s/D4D/CI/user_stats/OUTPUTfiles/user_frequency_numDistinctSUBPREFvisited.csv"
+    file_name = "/home/sscepano/Project7s/D4D/CI/user_stats/Traj/usr_traj.tsv"
     f = open(file_name, "r")
     
     user_stat = defaultdict(int)
     
     for line in f:
-        user, fq, dist = line.split(',')
+        user, traj = line.split('\t')
         user = int(user)
-        fq = int(fq)
-        dist = int(dist)
+        traj = float(traj)
         
-        user_stat[user] = (fq, dist)
+        user_stat[user] = traj
     
     return user_stat
 
