@@ -278,6 +278,12 @@ def calc_save_pole_users():
     pole_users[Lagunes_pole] -= Abijan_users
     pole_users[Abijan_pole] = Abijan_users
     
+    file_name = "/home/sscepano/Project7s/D4D/CI/users_population_density/pole_num_users.tsv"
+    f = open(file_name, "w")
+    
+    for pole in pole_users.keys():
+        f.write(str(pole) + '\t' + str(pole_users[pole]) + '\n')
+    
     return pole_users
         
     
