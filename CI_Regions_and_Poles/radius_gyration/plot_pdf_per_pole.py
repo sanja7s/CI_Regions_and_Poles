@@ -5,7 +5,14 @@ Created on Jun 24, 2014
 '''
 from collections import defaultdict, OrderedDict
 import matplotlib.pyplot as plt
-from os.path import isfile, join
+from os.path import join
+import prettyplotlib as ppl
+from scipy import interpolate
+
+from matplotlib.font_manager import FontProperties
+
+fontP = FontProperties()
+fontP.set_size('small')
 
 def read_in_rg(file_id):
     
@@ -34,10 +41,13 @@ def read_in_rg(file_id):
 
 def rg_pdf():
     
-    file_id_lst = [1,2,3,4,5,6,7,8,9,0]
+    file_id_dict = {1: ("Southwest", "-"),2: ("West","-"),3: ("Northwest", "-"),4: ("North", "-"),\
+                    5: ("Northeast", "-"),6: ("Central East", "-"),7: ("Central West", "-"),\
+                    8: ("Central North", "-") ,9: ("South", "-"), 10: ("Center", "-"), 11: ("Abidjan", "-"), \
+                    0: ("ALL", "-")}
     plt.figure(1)
     
-    for file_id in file_id_lst:
+    for file_id in file_id_dict.keys():
         nits, its = read_in_rg(file_id)
     
         mi = min(nits)
@@ -65,22 +75,31 @@ def rg_pdf():
             test += ordered[j]/float(len(nits))
             its7s.append(j)
             
+        f = interpolate.interp1d(its7s, nits7s, kind="nearest")
+            
         print test
             
+        xnew = its7s
+        ynew = f(its7s) 
     ############################################################################################################################
     # THIS is to plot number of users pdf
     ############################################################################################################################
     
-        plt.plot(its7s, nits7s, '.', linewidth=0.5, label= 'P' + str(file_id))
+#         ppl.plot(its7s, nits7s, file_id_dict[file_id][1], linewidth=0.5, label= file_id_dict[file_id][0])
+        
+        ppl.plot(xnew, ynew, file_id_dict[file_id][1], linewidth=0.5, label= file_id_dict[file_id][0])
     
     plt.xlabel('rg [km]')
     plt.ylabel('P(rg)')
-    plt.legend()   
+    ax = ppl.legend([ppl], "title", prop = fontP)
+    ppl.legend(bbox_to_anchor=(1.1, 1.05), prop = fontP)
+    
+#     ax = ppl.legend()  
     
     # this is if we want loglog lot, otheriwse comment and uncomment next line for regular plot file   
     plt.yscale('log')
     plt.xscale('log')
-    figure_name = "/home/sscepano/Project7s/D4D/CI/user_stats/Rg/perPOLE/pdf/rg_total.png"
+    figure_name = "/home/sscepano/Project7s/D4D/CI/user_stats/Rg/perPOLE/pdf/rg_per_Pole.png"
           
     print(figure_name)
     plt.savefig(figure_name, format = "png", dpi=300) 
